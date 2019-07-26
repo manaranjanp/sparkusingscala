@@ -36,10 +36,33 @@ var company_count_df = initialDF.groupBy($"company").count()
 
 company_count_df = company_count_df.orderBy(desc("count"))
 
-
-
-
-
 val streamingQuery = company_count_df.writeStream.queryName("stream_2s").trigger(Trigger.ProcessingTime("5 seconds")).format("console").outputMode("complete").start()
 
 streamingQuery.stop()
+
+
+import org.apache.spark.sql.functions.window
+
+var company_count_window_df = initialDF.groupBy($"company", window($"time", "1 day")).count()
+
+var count_window_df = company_count_window_df.select($"window.start".as("start"), 
+                           $"window.end".as("end"), 
+                           $"company", 
+                           $"count").orderBy($"start", $"company").orderBy(desc("start"))
+          
+          
+val windowStreamingQuery = count_window_df.writeStream.queryName("stream_1s").trigger(Trigger.ProcessingTime("10 seconds")).format("console").outputMode("complete").start()
+
+
+windowStreamingQuery.stop()
+
+
+for (s <- spark.streams.active) 
+  s.stop() 
+          
+                           
+                           
+val checkpointPath = "file:///home/hadoop/lab/data/stream/checkpoint/"
+val outputPath = "file:///home/hadoop/lab/data/stream/result/"
+
+val streamingQuery = company_count_df.writeStream.queryName("stream_3s").trigger(Trigger.ProcessingTime("5 seconds")).format("csv").outputMode("append").option("checkpointLocation", checkpointPath).start(outputPath)
