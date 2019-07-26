@@ -2,7 +2,7 @@
 
 https://github.com/manaranjanp/sparkusingscala
 
-FileName: Online Retail.zip
+FileName: Online Retail.zip (the file is available in data folder of the above github project)
 
 2. Attribute Information:
 
@@ -18,7 +18,7 @@ Country: Country name. Nominal, the name of the country where each customer resi
 
 Complete the following steps:
 
-1. Read the table as per user defined schema 
+1. Read the file into spark as per the user defined schema 
 
     val invoiceSchema = StructType(List(
       StructField("InvoiceNo", IntegerType, true),
@@ -34,7 +34,7 @@ Complete the following steps:
 
 2. Discard the records where Quantity is negative value.
 
-3. Convert the InvoiceData to a timestamp column and derive to more columns year and month and add to the dataframe.
+3. Convert the InvoiceData to a timestamp column and derive two more columns year and month and add to the dataframe.
 
 4. Calculate the invoice value by multiplying unit price and quantity.
 
