@@ -1,0 +1,56 @@
+1. Download the dataset from 
+
+https://github.com/manaranjanp/sparkusingscala
+
+FileName: Online Retail.zip
+
+2. Attribute Information:
+
+InvoiceNo: Invoice number. Nominal, a 6-digit integral number uniquely assigned to each transaction. If this code starts with letter 'c', it indicates a cancellation. 
+StockCode: Product (item) code. Nominal, a 5-digit integral number uniquely assigned to each distinct product. 
+Description: Product (item) name. Nominal. 
+Quantity: The quantities of each product (item) per transaction. Numeric.
+InvoiceDate: Invice Date and time. Numeric, the day and time when each transaction was generated. 
+UnitPrice: Unit price. Numeric, Product price per unit in sterling. 
+CustomerID: Customer number. Nominal, a 5-digit integral number uniquely assigned to each customer. 
+Country: Country name. Nominal, the name of the country where each customer resides.
+
+
+Complete the following steps:
+
+1. Read the table as per user defined schema 
+
+    val invoiceSchema = StructType(List(
+      StructField("InvoiceNo", IntegerType, true),
+      StructField("StockCode", StringType, true),
+      StructField("Description", StringType, true),
+      StructField("Quantity", IntegerType, true),
+      StructField("InvoiceDate", StringType, true),
+      StructField("UnitPrice", DoubleType, true),
+      StructField("CustomerID", IntegerType, true),
+      StructField("Country", StringType, true)
+    ))     
+
+
+2. Discard the records where Quantity is negative value.
+
+3. Convert the InvoiceData to a timestamp column and derive to more columns year and month and add to the dataframe.
+
+4. Calculate the invoice value by multiplying unit price and quantity.
+
+5. Store the resulting data in parquet format and partition by year.
+
+6. Load the data from parquet
+
+6. Find top 10 customers by revenue for each each month for the year 2010.
+
+  a) Change the number of partitions to 2, 4 and 8 and note down the processing time from Spark UI.
+  b) Change shuffle partitions to 10, 20, 30 and note down the processing time from Spark UI.
+  
+7. Find the total amount by the following grouping clauses
+
+  a) stock code
+  b) customer id
+  c) year, stock code
+  
+8. Store the result as persistence table (hive meta store) using csv format.  
