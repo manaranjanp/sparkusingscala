@@ -1,0 +1,45 @@
+import org.apache.log4j.Logger
+import org.apache.log4j.Level
+
+Logger.getLogger("org").setLevel(Level.ERROR)
+Logger.getLogger("akka").setLevel(Level.ERROR)
+
+
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, LongType, TimestampType};
+
+val newsSchema = StructType(Array(
+  StructField("id", LongType),
+  StructField("text", StringType),
+  StructField("timestamp", StringType),
+  StructField("source", StringType),
+  StructField("code", StringType),  
+  StructField("company", StringType),
+  StructField("url", StringType),
+  StructField("verified", StringType)))
+
+
+
+val rawDF = spark.readStream.option("maxFilesPerTrigger",1).schema(newsSchema).csv("file:///home/hadoop/lab/data/stocks")                                             
+
+var initialDF = rawDF.withColumn( "time", unix_timestamp($"timestamp", "EEE MMM dd hh:mm:ss +0000 yyyy").cast("timestamp"))
+
+initialDF.isStreaming
+
+import org.apache.spark.sql.streaming.Trigger
+
+val firstQuery = initialDF.select($"company", $"time").writeStream.queryName("stream_1s").trigger(Trigger.ProcessingTime("5 seconds")).format("console").outputMode("append").start()
+
+firstQuery.stop()
+
+
+var company_count_df = initialDF.groupBy($"company").count()
+
+company_count_df = company_count_df.orderBy(desc("count"))
+
+
+
+
+
+val streamingQuery = company_count_df.writeStream.queryName("stream_2s").trigger(Trigger.ProcessingTime("5 seconds")).format("console").outputMode("complete").start()
+
+streamingQuery.stop()
